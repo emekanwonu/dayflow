@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DayFlow – Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #1a1a2e;
+      --muted:     #6b7280;
+      --accent:    #4f6ef7;
+      --accent-dk: #3a56d4;
+      --surface:   #ffffff;
+      --bg:        #f0f2ff;
+      --border:    #dde1f5;
+      --error:     #e53e3e;
+      --success:   #38a169;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      display: flex;
+      width: 100%;
+      max-width: 880px;
+      min-height: 560px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(79,110,247,.15);
+    }
+
+    .panel-left {
+      flex: 1;
+      background: linear-gradient(145deg, #4f6ef7 0%, #7b5ea7 100%);
+      padding: 56px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel-left::before {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+      top: -80px; right: -80px;
+    }
+    .panel-left::after {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.05);
+      bottom: -60px; left: -40px;
+    }
+
+    .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      letter-spacing: -.5px;
+    }
+    .brand span { opacity: .6; }
+
+    .panel-tagline { z-index: 1; }
+    .panel-tagline h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.75rem;
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+    .panel-tagline p {
+      font-size: .9rem;
+      opacity: .8;
+      line-height: 1.6;
+    }
+
+    .feat-list { list-style: none; z-index: 1; }
+    .feat-list li {
+      font-size: .85rem;
+      opacity: .85;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .feat-list li::before {
+      content: '✓';
+      background: rgba(255,255,255,.2);
+      border-radius: 50%;
+      width: 20px; height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      flex-shrink: 0;
+    }
+
+    .panel-right {
+      flex: 1;
+      background: var(--surface);
+      padding: 48px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .tabs {
+      display: flex;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      border-radius: 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .tab-btn.active {
+      background: var(--surface);
+      color: var(--accent);
+      box-shadow: 0 2px 8px rgba(79,110,247,.12);
+    }
+
+    .form-panel { display: none; }
+    .form-panel.active { display: block; }
+
+    .form-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .form-sub {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+      letter-spacing: .3px;
+    }
+
+    .input-wrap { position: relative; }
+    .input-wrap .icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: 11px 14px 11px 40px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      color: var(--ink);
+      outline: none;
+      transition: border .2s, box-shadow .2s;
+      background: #fafbff;
+    }
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,110,247,.12);
+      background: #fff;
+    }
+    .input-wrap input.error { border-color: var(--error); }
+
+    .toggle-pw {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: .85rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .field-error {
+      font-size: .75rem;
+      color: var(--error);
+      margin-top: 4px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    .pw-strength { margin-top: 6px; display: none; }
+    .pw-strength.show { display: block; }
+    .strength-bar {
+      height: 4px;
+      border-radius: 4px;
+      background: var(--border);
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 0%;
+      transition: width .3s, background .3s;
+    }
+    .strength-label {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .extras {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      font-size: .82rem;
+    }
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .checkbox-wrap input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 15px; height: 15px;
+    }
+    .link { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .link:hover { text-decoration: underline; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .1s, box-shadow .2s;
+      box-shadow: 0 4px 14px rgba(79,110,247,.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: var(--accent-dk); box-shadow: 0 6px 18px rgba(79,110,247,.4); }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-primary:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+    /* Spinner */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+    .btn-primary.loading .spinner { display: block; }
+    .btn-primary.loading .btn-label { opacity: .7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .btn-google {
+      width: 100%;
+      padding: 11px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      font-weight: 500;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background .2s, border .2s;
+    }
+    .btn-google:hover { background: var(--bg); border-color: var(--accent); }
+    .btn-google svg { width: 18px; height: 18px; }
+
+    .terms {
+      font-size: .75rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
+    /* Server error banner */
+    .server-error {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      color: var(--error);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: .82rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .server-error.show { display: block; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--ink);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: .85rem;
+      box-shadow: 0 6px 24px rgba(0,0,0,.2);
+      transition: transform .3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: var(--success); }
+    .toast.fail    { background: var(--error); }
+
+    @media (max-width: 640px) {
+      .panel-left { display: none; }
+      .panel-right { padding: 36px 28px; border-radius: 20px; }
+      .card { border-radius: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- LEFT PANEL -->
+  <div class="panel-left">
+    <div class="brand">DayFlow<span>.</span></div>
+    <div class="panel-tagline">
+      <h2>Plan your day.<br>Own your time.</h2>
+      <p>A smarter planner that keeps your tasks, schedule, and goals in one place.</p>
+    </div>
+    <ul class="feat-list">
+      <li>Daily & weekly task planning</li>
+      <li>Priority levels & categories</li>
+      <li>Progress tracking & streaks</li>
+      <li>Reminders & time blocks</li>
+    </ul>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="panel-right">
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('login')">Log In</button>
+      <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- ── LOGIN ── -->
+    <div id="login" class="form-panel active">
+      <p class="form-title">Welcome back</p>
+      <p class="form-sub">Log in to continue to your planner.</p>
+
+      <div class="server-error" id="login-server-err"></div>
+
+      <div class="field">
+        <label for="login-email">Email address</label>
+        <div class="input-wrap">
+          <span class="icon">✉</span>
+          <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+        <div class="field-error" id="login-email-err">Please enter a valid email.</div>
+      </div>
+
+      <div class="field">
+        <label for="login-pw">Password</label>
+        <div class="input-wrap">
+          <span class="icon">🔒</span>
+          <input type="password" id="login-pw" placeholder="Your password" autocomplete="current-password"/>
+          <button class="toggle-pw" type="button" onclick="togglePw('login-pw', this)">Show</button>
+        </div>
+        <div class="field-error" id="login-pw-err">Password is required.</div>
+      </div>
+
+      <div class="extras">
+        <label class="checkbox-wrap">
+          <input type="checkbox" id="remember"/> Remember me
+        </label>
+        <a href="#" class="link">Forgot password?</a>
+      </div>
+
+      <button class="btn-primary" id="login-btn" onclick="handleLogin()">
+        <span class="spinner"></span>
+        <span class="btn-label">Log In</span>
+      </button>
+
+      <div class="divider">or</div>
+
+      <button class="btn-google" type="button">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+    </div>
+
+    <!-- ── SIGNUP ── -->
+    <div id="signup" class="form-panel">
+      <p class="form-title">Create account</p>
+      <p class="form-sub">Start planning smarter today.</p>
+
+      <div class="server-error" id="signup-server-err"></div>
+
+      <div class="field">
+        <label for="su-name">Full name</label>
+        <div class="input-wrap">
+          <span class="icon">👤</span>
+          <input type="text" id="su-name" placeholder="Emeka Obi" autocomplete="name"/>
+        </div>
+        <div class="field-error" id="su-name-err">Name is required.</div>
+      </div>
+
+      <div class="field">
+        <label for="su-email">Email address</label>
+        <div class="input-wrap">
+          <span class="icon">✉</span>
+          <input type="email" id="su-email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+        <div class="field-error" id="su-email-err">Please enter a valid email.</div>
+      </div>
+
+      <div class="field">
+        <label for="su-pw">Password</label>
+        <div class="input-wrap">
+          <span class="icon">🔒</span>
+          <input type="password" id="su-pw" placeholder="Create a strong password" autocomplete="new-password" oninput="checkStrength(this.value)"/>
+          <button class="toggle-pw" type="button" onclick="togglePw('su-pw', this)">Show</button>
+        </div>
+        <div class="field-error" id="su-pw-err">Password must be at least 8 characters.</div>
+        <div class="pw-strength" id="pw-strength">
+          <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+          <div class="strength-label" id="strength-label">Strength: —</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="su-confirm">Confirm password</label>
+        <div class="input-wrap">
+          <span class="icon">🔒</span>
+          <input type="password" id="su-confirm" placeholder="Repeat your password" autocomplete="new-password"/>
+          <button class="toggle-pw" type="button" onclick="togglePw('su-confirm', this)">Show</button>
+        </div>
+        <div class="field-error" id="su-confirm-err">Passwords do not match.</div>
+      </div>
+
+      <button class="btn-primary" id="signup-btn" onclick="handleSignup()">
+        <span class="spinner"></span>
+        <span class="btn-label">Create Account</span>
+      </button>
+
+      <div class="divider">or</div>
+
+      <button class="btn-google" type="button">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <p class="terms">
+        By signing up you agree to our <a href="#" class="link">Terms of Service</a>
+        and <a href="#" class="link">Privacy Policy</a>.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Config — change this to your server URL ──
+  const API = 'https://dayflow-api-epso.onrender.com/api';
+
+  // ── Tab switch ──
+  function switchTab(tab) {
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    document.querySelectorAll('.tab-btn')[tab === 'login' ? 0 : 1].classList.add('active');
+    clearAllErr();
+  }
+
+  // ── Show/hide password ──
+  function togglePw(id, btn) {
+    const inp = document.getElementById(id);
+    const hidden = inp.type === 'password';
+    inp.type = hidden ? 'text' : 'password';
+    btn.textContent = hidden ? 'Hide' : 'Show';
+  }
+
+  // ── Password strength ──
+  function checkStrength(val) {
+    const wrap  = document.getElementById('pw-strength');
+    const fill  = document.getElementById('strength-fill');
+    const label = document.getElementById('strength-label');
+    wrap.classList.toggle('show', val.length > 0);
+    let score = 0;
+    if (val.length >= 8)          score++;
+    if (/[A-Z]/.test(val))        score++;
+    if (/[0-9]/.test(val))        score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+      { pct: '20%',  color: '#e53e3e', text: 'Weak' },
+      { pct: '45%',  color: '#dd6b20', text: 'Fair' },
+      { pct: '70%',  color: '#d69e2e', text: 'Good' },
+      { pct: '100%', color: '#38a169', text: 'Strong' },
+    ];
+    const lv = levels[Math.max(0, score - 1)];
+    fill.style.width      = lv.pct;
+    fill.style.background = lv.color;
+    label.textContent     = `Strength: ${lv.text}`;
+  }
+
+  // ── Error helpers ──
+  function showFieldErr(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function showServerErr(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function clearAllErr() {
+    document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('.server-error').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('input').forEach(i => i.classList.remove('error'));
+  }
+
+  // ── Toast ──
+  function toast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  // ── Button loading state ──
+  function setLoading(btnId, isLoading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = isLoading;
+    btn.classList.toggle('loading', isLoading);
+  }
+
+  // ── Save token ──
+  function saveSession(data, remember) {
+    const storage = remember ? localStorage : sessionStorage;
+    storage.setItem('dayflow_token', data.token);
+    storage.setItem('dayflow_user',  JSON.stringify(data.user));
+  }
+
+  // ──────────────────────────────────────────
+  // LOGIN
+  // ──────────────────────────────────────────
+  async function handleLogin() {
+    clearAllErr();
+
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-pw').value;
+    const remember = document.getElementById('remember').checked;
+
+    // Client-side validation
+    let ok = true;
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      showFieldErr('login-email-err', 'Please enter a valid email.'); ok = false;
+    }
+    if (!password) {
+      showFieldErr('login-pw-err', 'Password is required.'); ok = false;
+    }
+    if (!ok) return;
+
+    setLoading('login-btn', true);
+
+    try {
+      const res  = await fetch(`${API}/auth/login`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showServerErr('login-server-err', data.message || 'Login failed. Please try again.');
+        return;
+      }
+
+      saveSession(data, remember);
+      toast('Logged in successfully! 🎉', 'success');
+
+      // Redirect to dashboard after short delay
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1200);
+
+    } catch (err) {
+      showServerErr('login-server-err', 'Could not reach the server. Check your connection.');
+    } finally {
+      setLoading('login-btn', false);
+    }
+  }
+
+  // ──────────────────────────────────────────
+  // SIGN UP
+  // ──────────────────────────────────────────
+  async function handleSignup() {
+    clearAllErr();
+
+    const name     = document.getElementById('su-name').value.trim();
+    const email    = document.getElementById('su-email').value.trim();
+    const password = document.getElementById('su-pw').value;
+    const confirm  = document.getElementById('su-confirm').value;
+
+    // Client-side validation
+    let ok = true;
+    if (!name)                                    { showFieldErr('su-name-err',    'Name is required.');                   ok = false; }
+    if (!email || !/\S+@\S+\.\S+/.test(email))   { showFieldErr('su-email-err',   'Please enter a valid email.');         ok = false; }
+    if (password.length < 8)                      { showFieldErr('su-pw-err',      'Password must be at least 8 chars.');  ok = false; }
+    if (password !== confirm)                     { showFieldErr('su-confirm-err', 'Passwords do not match.');             ok = false; }
+    if (!ok) return;
+
+    setLoading('signup-btn', true);
+
+    try {
+      const res  = await fetch(`${API}/auth/signup`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showServerErr('signup-server-err', data.message || 'Signup failed. Please try again.');
+        return;
+      }
+
+      saveSession(data, false);
+      toast('Account created! Welcome aboard 🚀', 'success');
+
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1200);
+
+    } catch (err) {
+      showServerErr('signup-server-err', 'Could not reach the server. Check your connection.');
+    } finally {
+      setLoading('signup-btn', false);
+    }
+  }
+
+  // ── Redirect if already logged in ──
+  (function checkAuth() {
+    const token = localStorage.getItem('dayflow_token') || sessionStorage.getItem('dayflow_token');
+    if (token) window.location.href = 'dashboard.html';
+  })();
+</script>
+</body>
+</html>
